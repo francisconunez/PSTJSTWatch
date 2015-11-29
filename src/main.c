@@ -12,7 +12,6 @@ static GFont s_time_font, s_date_font, tz_font;
 static int s_battery_level;
 static int s_utcOffset;
 static bool s_battery_plugged;
-static struct tm zulu_tick_time;
 
 
 static void inbox_received_callback(DictionaryIterator *received, void *context) {
@@ -80,8 +79,8 @@ static void update_time() {
     text_layer_set_text(jst_time_layer, jstBuffer+(('0' == jstBuffer[0])?1:0));
   }
   //Display JST date
-  static char jst_date_buffer[16];
-  strftime(jst_date_buffer, sizeof(jst_date_buffer), "%a.%b.%d%n%Y", tick_time2);
+  static char jst_date_buffer[24];
+  strftime(jst_date_buffer, sizeof(jst_date_buffer), "%b.%d.%Y%n%A", tick_time2);
   text_layer_set_text(jst_date_layer, jst_date_buffer);
   
   
@@ -96,8 +95,8 @@ static void update_time() {
   }
     
   //Display JST date
-  static char pst_date_buffer[16];
-  strftime(pst_date_buffer, sizeof(pst_date_buffer), "%a.%b.%d%n%Y", tick_time);
+  static char pst_date_buffer[24];
+  strftime(pst_date_buffer, sizeof(pst_date_buffer), "%b.%d.%Y%n%A", tick_time);
   text_layer_set_text(pst_date_layer, pst_date_buffer);
 }
 
