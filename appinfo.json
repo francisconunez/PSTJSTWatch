@@ -1,0 +1,54 @@
+{
+    "appKeys": {
+        "timezoneOffset": 0
+    },
+    "capabilities": [
+        ""
+    ],
+    "companyName": "F.Nunez",
+    "longName": "JST/PST Timezone Watch",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/tzIcon.png",
+                "menuIcon": true,
+                "name": "TZICON",
+                "type": "png"
+            },
+            {
+                "file": "fonts/Braciola MS ExB.ttf",
+                "name": "FONT_BRACIOLA_34",
+                "type": "font"
+            },
+            {
+                "file": "fonts/makhina.ttf",
+                "name": "FONT_MAKHINA_32",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Solaria.ttf",
+                "name": "FONT_SOLARIA_12",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Solaria.ttf",
+                "name": "FONT_SOLARIA_34",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Solaria.ttf",
+                "name": "FONT_SOLARIA_16",
+                "type": "font"
+            }
+        ]
+    },
+    "sdkVersion": "2",
+    "shortName": "J&P Watch",
+    "uuid": "5b0aa589-4ba4-40a6-9a71-b527d4ab0fa9",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
