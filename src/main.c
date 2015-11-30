@@ -7,24 +7,9 @@ static TextLayer *pst_time_layer, *pst_date_layer,
 static Layer *s_battery_layer;
 static InverterLayer *inverter_layer;
 static GFont s_time_font, s_date_font, tz_font;
-
-
 static int s_battery_level;
 static int s_utcOffset;
 static bool s_battery_plugged;
-
-
-static void inbox_received_callback(DictionaryIterator *received, void *context) {
-  Tuple *timezone_offset_tuple = dict_find(received, 0);
-
-  if (timezone_offset_tuple) {
-    int32_t timezone_offset = timezone_offset_tuple->value->int32;
-
-    // Calculate UTC time
-    s_utcOffset = timezone_offset;
-    
-  }
-}
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
@@ -38,7 +23,6 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
 }
 
-
 static void battery_callback(BatteryChargeState state) {
   // Record the new battery level
   s_battery_level = state.charge_percent;
@@ -48,22 +32,13 @@ static void battery_callback(BatteryChargeState state) {
 }
 
 static void update_time() {
-  //time_t local, utc;
-  //local = time(NULL);
-
-		//utc = local + s_utcOffset;
-
-
-		//zulu_tick_time = *(localtime(&utc));
-  
-  
   time_t temp, utc, jst, pst; 
   temp = time(NULL);
   utc = time(NULL);
   struct tm *tick_time = localtime(&temp);
-  utc = utc + s_utcOffset; //utc time
-  jst = utc + 32400; //utc to jst hours->min->sec
-  pst = utc + (-28800);
+  utc = utc + s_utcOffset; //UTC time
+  jst = utc + 32400; //UTC to JST offset in sec
+  pst = utc + (-28800);// UTC to PST
   struct tm *tick_time2 = localtime(&jst);
 
   // Create a long-lived buffer, and show the time
@@ -83,9 +58,8 @@ static void update_time() {
   strftime(jst_date_buffer, sizeof(jst_date_buffer), "%b.%d.%Y%n%A", tick_time2);
   text_layer_set_text(jst_date_layer, jst_date_buffer);
   
-  
   //Display PST time
-  tick_time = localtime(&pst);
+  tick_time = localtime(&pst);//causes tiem to display the same for both zones without this
   if(clock_is_24h_style()) {
     strftime(pstBuffer, sizeof("00:00"), "%H:%M", tick_time);
     text_layer_set_text(pst_time_layer, pstBuffer);
@@ -93,18 +67,27 @@ static void update_time() {
     strftime(pstBuffer, sizeof("00:00AM"), "%I:%M%p", tick_time);
     text_layer_set_text(pst_time_layer, pstBuffer+(('0' == pstBuffer[0])?1:0));
   }
-    
-  //Display JST date
+  //Display PST date
   static char pst_date_buffer[24];
   strftime(pst_date_buffer, sizeof(pst_date_buffer), "%b.%d.%Y%n%A", tick_time);
   text_layer_set_text(pst_date_layer, pst_date_buffer);
 }
 
+static void inbox_received_callback(DictionaryIterator *received, void *context) {
+  Tuple *timezone_offset_tuple = dict_find(received, 0);
+
+  if (timezone_offset_tuple) {
+    int32_t timezone_offset = timezone_offset_tuple->value->int32;
+
+    // Calculate UTC time
+    s_utcOffset = timezone_offset;
+    update_time();//functions must be declared before their first use
+  }
+}
+
 static void battery_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
-  
   // Find the height of the bar
-
   int height = (int)(float)(((float)s_battery_level / 100.0F) * 168.0F);
   int heightOffset = 168 - height;
   int topheight = heightOffset/2;
@@ -127,7 +110,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void main_window_load(Window *window) {
-  // Create PST & JST Label TextLayer
+  // Create PST Label TextLayer
   tz_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SOLARIA_12));
   pst_layer = text_layer_create(GRect(4, 0, 50, 20));
   text_layer_set_background_color(pst_layer, GColorClear);
@@ -136,7 +119,7 @@ static void main_window_load(Window *window) {
   text_layer_set_font(pst_layer, tz_font);
   text_layer_set_text_alignment(pst_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(pst_layer));
-  
+  // Create JST Label TextLayer
   jst_layer = text_layer_create(GRect(4, 84, 50, 20));
   text_layer_set_background_color(jst_layer, GColorClear);
   text_layer_set_text_color(jst_layer, GColorWhite);
@@ -197,20 +180,12 @@ static void main_window_load(Window *window) {
   // Initialize the display
   update_time();
   battery_callback(battery_state_service_peek());
-
-
 }
 
 static void main_window_unload(Window *window) {
   fonts_unload_custom_font(tz_font);
   fonts_unload_custom_font(s_time_font);
   fonts_unload_custom_font(s_date_font);
-  
-
-
-
-
-  
   text_layer_destroy(pst_time_layer);
   text_layer_destroy(pst_date_layer);
   text_layer_destroy(jst_time_layer);
@@ -242,7 +217,6 @@ static void init() {
 
   // Open AppMessage
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
-
 }
 
 static void deinit() {

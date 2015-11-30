@@ -17,18 +17,13 @@
                 "type": "png"
             },
             {
-                "file": "fonts/Braciola MS ExB.ttf",
-                "name": "FONT_BRACIOLA_34",
-                "type": "font"
-            },
-            {
                 "file": "fonts/makhina.ttf",
                 "name": "FONT_MAKHINA_32",
                 "type": "font"
             },
             {
                 "file": "fonts/Solaria.ttf",
-                "name": "FONT_SOLARIA_12",
+                "name": "FONT_SOLARIA_16",
                 "type": "font"
             },
             {
@@ -38,7 +33,12 @@
             },
             {
                 "file": "fonts/Solaria.ttf",
-                "name": "FONT_SOLARIA_16",
+                "name": "FONT_SOLARIA_12",
+                "type": "font"
+            },
+            {
+                "file": "fonts/Braciola MS ExB.ttf",
+                "name": "FONT_BRACIOLA_34",
                 "type": "font"
             }
         ]
